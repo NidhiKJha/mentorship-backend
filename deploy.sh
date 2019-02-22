@@ -47,13 +47,15 @@ else
     echo "Publishing failed."
     exit 2
 fi
+
 # Pylint code quality check
-find . -name "*.py" -depth -exec pylint {} \; |   # Finding files with .py extension
-grep -oE "\-?[0-9]+\.[0-9]+" |                    # Extract the score from each message
-awk 'NR==1 || NR % 4 == 0' |                      # Previous command will generate garbage numbers as well, this cuts away unnecessary data
-while read -r i
-do  
-    if (( $(echo "$i < 7.00" |bc -l) )); then
-        exit 2    
-    fi
+
+find *.py -depth -exec pylint {} \; | 
+grep -oE "\-?[0-9]+\.[0-9]+" | 
+awk 'NR==1 || NR % 4 == 0' | 
+sed 's/...$//' |
+while read line ; do
+   if (( $(echo "$line > 7.00" |bc -l) )); then
+   exit 2
+   fi
 done
